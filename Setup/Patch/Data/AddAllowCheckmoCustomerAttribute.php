@@ -84,7 +84,7 @@ class AddAllowCheckmoCustomerAttribute implements DataPatchInterface
                     'user_defined' => true,
                     'is_filterable_in_grid' => false,
                     'system' => false,
-                    'label' => 'Allow Cash On Delivery',
+                    'label' => 'Allow Check / Money Order',
                     'source' => Boolean::class,
                     'position' => 999,
                     'type' => 'int',
