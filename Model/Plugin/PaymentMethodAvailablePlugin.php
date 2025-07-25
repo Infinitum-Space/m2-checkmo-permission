@@ -2,17 +2,19 @@
 
 namespace InfinitumSpace\CheckmoPermission\Model\Plugin;
 
-use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Payment\Model\MethodInterface;
 use Magento\Quote\Api\Data\CartInterface;
+use \Magento\Customer\Model\Session;
 
 class PaymentMethodAvailablePlugin
 {
-    private $customerRepository;
+    protected Session $customerSession;
 
-    public function __construct(CustomerRepositoryInterface $customerRepository)
+    public function __construct(
+        Session $customerSession,
+    )
     {
-        $this->customerRepository = $customerRepository;
+        $this->customerSession = $customerSession;
     }
 
     public function afterIsAvailable(
@@ -25,16 +27,16 @@ class PaymentMethodAvailablePlugin
             return $result;
         }
 
-        if (!$quote || !$quote->getCustomerId()) {
+        if (!$this->customerSession->isLoggedIn()) {
             return false;
         }
 
         try {
-            $customer = $this->customerRepository->getById($quote->getCustomerId());
-            $attribute = $customer->getCustomAttribute('allow_checkmo');
-            return (int)$attribute?->getValue() === 1;
+            $attribute = $this->customerSession->getCustomerData()->getCustomAttribute('allow_checkmo');
+            return (int)$attribute?->getValue() === 1 && $result;
         } catch (\Exception $e) {
             return false;
         }
     }
 }
+
